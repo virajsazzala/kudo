@@ -1,0 +1,13 @@
+[package]
+name = "kudo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bluer = { version = "0.17", features = ["bluetoothd", "rfcomm"] }
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+sha2 = "0.10"
+clap = { version = "4", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
