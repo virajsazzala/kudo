@@ -4,6 +4,8 @@ Kudo lets you stream a video from an Android phone to a Linux-based laptop over 
 
 This is a wire protocol over Bluetooth RFCOMM, a Rust receiver on Linux and a Kotlin sender on Android that implement said protocol, with integrity verification built in. The protocol and design are documented in [docs/](docs/).
 
+> Note: This is an experimental system, it's not production grade. It's not security-tested.
+
 ## How it works
 
 The phone picks a video and offers it up. The laptop connects over Bluetooth,
