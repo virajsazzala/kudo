@@ -1,11 +1,22 @@
 /*
- * bluetooth.c - Bluetooth transport implementation
- *
- * Implements device discovery and RFCOMM connection setup over
- * BlueZ's D-Bus API.
- *
- * Responsibilites:
- *     - Power on the local bluetooth adapter.
- *     - Resolve a target device.
- *     - Establish a connected RFCOMM stream to that device
+ * bluetooth.c - Generic bluetooth API implementation
  */
+
+#include "bluetooth/internal/bluez.h"
+
+#include <kudo/bluetooth/bluetooth.h>
+
+bool bt_init(const char *hci_address)
+{
+	return bz_init(hci_address);
+}
+
+bool bt_powered_on(void)
+{
+	return bz_powered_on();
+}
+
+void bt_cleanup()
+{
+	bz_cleanup();
+}
