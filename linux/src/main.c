@@ -11,6 +11,7 @@
  */
 
 #include <kudo/bluetooth/bluetooth.h>
+#include <kudo/bluetooth/discovery.h>
 #include <stdio.h>
 
 int main(void)
@@ -30,6 +31,21 @@ int main(void)
 
 	printf("bluetooth ready\n");
 
+	bt_device_t devices[BT_MAX_DEVICES];
+	size_t found;
+
+	if (!bt_discover(devices, BT_MAX_DEVICES, &found)) {
+		fprintf(stderr, "discovery failed\n");
+		bt_cleanup();
+		return 1;
+	}
+
+	for (size_t i = 0; i < found; i++) {
+		printf("[%zu] %s  \"%s\"  (RSSI: %d)\n", i, devices[i].address, devices[i].name,
+		       devices[i].rssi);
+	}
+
 	bt_cleanup();
+
 	return 0;
 }

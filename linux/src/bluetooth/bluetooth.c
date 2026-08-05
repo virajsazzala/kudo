@@ -3,6 +3,7 @@
  */
 
 #include "bluetooth/internal/bluez.h"
+#include "bluetooth/internal/discovery.h"
 
 #include <kudo/bluetooth/bluetooth.h>
 
@@ -18,7 +19,12 @@ bool bt_powered_on(void)
 	return bz_powered_on(&adapter);
 }
 
-void bt_cleanup()
+bool bt_discover(bt_device_t *devices, size_t max_devices, size_t *found)
+{
+	return bz_discover(&adapter, (bz_device_t *)devices, max_devices, found);
+}
+
+void bt_cleanup(void)
 {
 	bz_cleanup(&adapter);
 }
