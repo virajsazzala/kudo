@@ -1,0 +1,96 @@
+# .clang-format - C style configuration
+# Style: Linux kernel (Documentation/process/clang-format.rst)
+
+Language: Cpp
+Standard: c++03  # safe for C code parsed as C++
+
+# --- Indentation ---
+IndentWidth: 8
+TabWidth: 8
+UseTab: ForIndentation
+ContinuationIndentWidth: 8
+
+# --- Column limit ---
+ColumnLimit: 100
+
+# --- Brace style ---
+# Linux: function defs get brace on new line, control flow on same line
+BreakBeforeBraces: Linux
+
+# Braces around single-line if bodies are omitted; clang-format won't
+# insert them. Matches kernel style: no braces for single statements,
+# braces required when any branch is multi-line (enforced by review).
+InsertBraces: false
+
+# --- Alignment ---
+AlignAfterOpenBracket: Align        # args align to opening paren
+AlignConsecutiveAssignments: false  # don't force-align = across lines
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: true
+AlignTrailingComments: true
+
+# --- Allow short constructs on one line ---
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# --- Parameter and argument packing ---
+# Kernel style: pack as many as fit per line, align to opening paren.
+# If nothing fits after the paren, break and indent by ContinuationIndentWidth.
+BinPackArguments: true
+BinPackParameters: true
+AlwaysBreakAfterReturnType: None
+
+# --- Breaking ---
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakStringLiterals: true
+
+# --- Spaces ---
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeParens: ControlStatements  # if (...) not if(...)
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeSquareBrackets: false
+
+# --- Pointers and references ---
+PointerAlignment: Right  # int *ptr, not int* ptr
+
+# --- Include sorting ---
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  # 1. Project internal headers
+  - Regex:        '^"(internal|kudo)/'
+    Priority:     1
+    SortPriority: 1
+  # 2. Other project headers
+  - Regex:        '^"'
+    Priority:     2
+    SortPriority: 2
+  # 3. System/library headers
+  - Regex:        '^<'
+    Priority:     3
+    SortPriority: 3
+
+# --- Comments ---
+ReflowComments: true
+SpacesBeforeTrailingComments: 2  # two spaces before inline //
+
+# --- Misc ---
+DerivePointerAlignment: false
+DisableFormat: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+SortUsingDeclarations: true
+
