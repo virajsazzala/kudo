@@ -11,9 +11,6 @@
 #define IFACE_PROPERTIES "org.freedesktop.DBus.Properties"
 #define IFACE_ADAPTER1 "org.bluez.Adapter1"
 
-static DBusConnection *conn;
-static char adapter_path[256];
-
 /*
  * path_has_interface - check if an object-manager entry exposes an interface
  *
@@ -113,7 +110,7 @@ static bool get_adapter_address(DBusMessageIter *ifaces_iter, char *buf, size_t 
  *
  * Return: true and fills adapter_path on success, false otherwise.
  */
-static bool find_adapter(const char *hci_address)
+static bool find_adapter(bz_adapter_t *adapter, const char *hci_address)
 {
 	DBusMessage *msg;
 	DBusMessage *reply;
@@ -133,7 +130,8 @@ static bool find_adapter(const char *hci_address)
 
 	dbus_error_init(&err);
 
-	reply = dbus_connection_send_with_reply_and_block(conn, msg, BZ_DBUS_TIMEOUT_MS, &err);
+	reply = dbus_connection_send_with_reply_and_block(adapter->conn, msg, BZ_DBUS_TIMEOUT_MS,
+	                                                  &err);
 
 	dbus_message_unref(msg);
 
@@ -199,9 +197,9 @@ static bool find_adapter(const char *hci_address)
 				}
 			}
 
-			strncpy(adapter_path, obj_path, sizeof(adapter_path) - 1);
-			adapter_path[sizeof(adapter_path) - 1] = '\0';
-			BZ_LOG_INFO("using adapter %s", adapter_path);
+			strncpy(adapter->path, obj_path, sizeof(adapter->path) - 1);
+			adapter->path[sizeof(adapter->path) - 1] = '\0';
+			BZ_LOG_INFO("using adapter %s", adapter->path);
 			found = true;
 			break;
 		}
@@ -221,14 +219,14 @@ out:
 	return found;
 }
 
-bool bz_init(const char *hci_address)
+bool bz_init(bz_adapter_t *adapter, const char *hci_address)
 {
 	DBusError err;
 
 	dbus_error_init(&err);
 
 	/* Create connection to system bus */
-	conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
+	adapter->conn = dbus_bus_get(DBUS_BUS_SYSTEM, &err);
 
 	if (dbus_error_is_set(&err)) {
 		BZ_LOG_ERR("failed to connect to system bus: %s", err.message);
@@ -236,15 +234,15 @@ bool bz_init(const char *hci_address)
 		return false;
 	}
 
-	if (!conn) {
+	if (!adapter->conn) {
 		BZ_LOG_ERR("failed to connect to system bus: unknown error");
 		return false;
 	}
 
-	return find_adapter(hci_address);
+	return find_adapter(adapter, hci_address);
 }
 
-bool bz_powered_on(void)
+bool bz_powered_on(bz_adapter_t *adapter)
 {
 	DBusMessage *msg;
 	DBusMessage *reply;
@@ -253,7 +251,7 @@ bool bz_powered_on(void)
 	bool powered = false;
 
 	/* Get bluetooth adapter properties */
-	msg = dbus_message_new_method_call(BLUEZ_SERVICE, adapter_path, IFACE_PROPERTIES, "Get");
+	msg = dbus_message_new_method_call(BLUEZ_SERVICE, adapter->path, IFACE_PROPERTIES, "Get");
 
 	if (!msg) {
 		BZ_LOG_ERR("failed to allocate Properties.Get message");
@@ -267,7 +265,8 @@ bool bz_powered_on(void)
 	dbus_message_append_args(msg, DBUS_TYPE_STRING, &interface, DBUS_TYPE_STRING, &property,
 	                         DBUS_TYPE_INVALID);
 
-	reply = dbus_connection_send_with_reply_and_block(conn, msg, BZ_DBUS_TIMEOUT_MS, NULL);
+	reply = dbus_connection_send_with_reply_and_block(adapter->conn, msg, BZ_DBUS_TIMEOUT_MS,
+	                                                  NULL);
 
 	dbus_message_unref(msg);
 
@@ -292,10 +291,10 @@ bool bz_powered_on(void)
 	return powered;
 }
 
-void bz_cleanup(void)
+void bz_cleanup(bz_adapter_t *adapter)
 {
-	if (conn) {
-		dbus_connection_unref(conn);
-		conn = NULL;
+	if (adapter->conn) {
+		dbus_connection_unref(adapter->conn);
+		adapter->conn = NULL;
 	}
 }
